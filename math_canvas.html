@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Simulation Math Canvas - Reflection</title>
+		<style type="text/css">
+			button, input {
+				outline: none;
+				text-align: center;
+			}
+			.mirror-image {
+				background-image: url("mirror_01.png");
+				background-color: #fff;
+				background-position: 250px 30px;
+				background-repeat: no-repeat;
+			}
+			.border-single {
+				border: 2px solid #ccc;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas class="mirror-image border-single" id="plot" width="500" height="500">
+			<p>Seu navegador não suporta o recurso CANVAS</p>
+		</canvas>
+		<form id="form-counters">
+			<button type="button" id="btn-plus" class="btn-posy">+</button>
+			<button type="button" id="btn-minus" class="btn-posy">-</button>
+			<input type="number" name="posy" min="0" max="150" value="0" id="pos-y">
+		</form>
+		<script type="text/javascript">
+			let canvas = document.getElementById('plot')
+			let ctx = canvas.getContext('2d')
+
+			let animate
+
+			let angle = 0;
+			let deg = 0;
+			let xx = yy = 0;
+
+			let w_canvas = 500
+			let h_canvas = 500
+
+			let init_x = 100
+			let init_y = 300
+			let end_x = 300
+			let end_y = 300
+
+			let end_y_r = 0;
+
+			let flash_light = 'flashlight.png';
+
+			function lines(new_pos,type_pos) {
+				if(type_pos == 'up') {
+					deg = deg - 0.2
+					end_y = end_y - 1
+
+					end_x_r = end_x - end_x
+
+					if(end_y_r === 0) {
+						end_y_r = end_y
+					}
+					
+					end_y_r = end_y_r - 5
+
+					init_x = (init_x - 0.07)
+					init_y = (init_y - 0.07)
+				}else{
+					deg = deg + 0.2
+					end_y = end_y + 1
+
+					end_x_r = end_x - end_x
+
+					if(end_y_r === 0) {
+						end_y_r = end_y
+					}
+					
+					end_y_r = end_y_r + 5
+
+					init_x = (init_x + 0.07)
+					init_y = (init_y + 0.07)
+				}
+
+				ctx.clearRect(0,0,w_canvas,h_canvas)
+
+				ctx.strokeStyle = '#ff0000'
+				ctx.lineWidth = 5
+				
+				ctx.beginPath()
+				ctx.moveTo(init_x, init_y)
+				ctx.lineTo(end_x, end_y)
+				ctx.lineTo(end_x_r, end_y_r)
+				ctx.stroke()
+
+				images(flash_light,75,318,deg);
+
+				document.getElementById("pos-y").value = new_pos;
+			}
+
+			function images(url_img,x,y,degrees) {
+				const img = new Image();
+
+				img.onload = () => {
+					ctx.save();
+					ctx.translate(x, y);
+					ctx.rotate(0.017453292519943295 * degrees);  // 0.017453292519943295 == Math.PI / 180
+					ctx.drawImage(img, -0.5 * img.width, -0.5 * img.width);
+					ctx.restore();
+				};
+
+				img.src = url_img;
+			}
+
+			function up() {
+				if(angle < 150) {
+					angle++;
+					lines(angle,'up');	
+				}
+			}
+			function down() {
+				if(angle > 0) {
+					angle--;
+					lines(angle,'down');	
+				}
+			}
+
+			images(flash_light,75,318,deg);
+
+			document.getElementById("btn-plus").onclick = function() {
+				up();
+			};
+			document.getElementById("btn-minus").onclick = function() {
+				down();
+			};
+
+			document.getElementById("pos-y").onchange = function() {
+				let last_angle = document.getElementById("pos-y").value;
+
+				if(parseInt(last_angle) < angle) {
+					down();
+				}else{
+					up();
+				}
+			};
+		</script>
+	</body>
+</html>
